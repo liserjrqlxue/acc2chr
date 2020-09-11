@@ -55,12 +55,13 @@ var (
 func main() {
 	version.LogVersion()
 	flag.Parse()
-	if *vcf == "" {
-		print("-v is required")
-		flag.Usage()
-		os.Exit(1)
+
+	var f *os.File
+	if *vcf == "" || *vcf == "-" {
+		f = os.Stdin
+	} else {
+		f = osUtil.Open(*vcf)
 	}
-	var f = osUtil.Open(*vcf)
 	defer simpleUtil.DeferClose(f)
 
 	var scanner = bufio.NewScanner(f)
