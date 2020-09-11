@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"compress/gzip"
 	"flag"
 	"fmt"
 	"os"
@@ -56,15 +57,21 @@ func main() {
 	version.LogVersion()
 	flag.Parse()
 
-	var f *os.File
+	var scanner *bufio.Scanner
 	if *vcf == "" || *vcf == "-" {
-		f = os.Stdin
+		var f = os.Stdin
+		defer simpleUtil.DeferClose(f)
+		scanner = bufio.NewScanner(f)
+	} else if strings.HasSuffix(*vcf, "gz") || strings.HasSuffix(*vcf, "bgz") {
+		var f = osUtil.Open(*vcf)
+		defer simpleUtil.DeferClose(f)
+		var g = simpleUtil.HandleError(gzip.NewReader(f)).(*gzip.Reader)
+		defer simpleUtil.DeferClose(g)
+		scanner = bufio.NewScanner(g)
 	} else {
-		f = osUtil.Open(*vcf)
+		var f = osUtil.Open(*vcf)
+		scanner = bufio.NewScanner(f)
 	}
-	defer simpleUtil.DeferClose(f)
-
-	var scanner = bufio.NewScanner(f)
 
 	for scanner.Scan() {
 		if line := scanner.Text(); sharp.MatchString(line) {
