@@ -8,9 +8,9 @@ import (
 	"regexp"
 	"strings"
 
-	"liser.jrqlxue/goUtil/osUtil"
-	"liser.jrqlxue/goUtil/simpleUtil"
-	"liser.jrqlxue/version"
+	"github.com/liserjrqlxue/goUtil/osUtil"
+	"github.com/liserjrqlxue/goUtil/simpleUtil"
+	"github.com/liserjrqlxue/version"
 )
 
 var (
