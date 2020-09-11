@@ -42,7 +42,8 @@ var (
 		"NC_000024.9":  "Y",
 		"NC_012920.1":  "MT",
 	}
-	sharp = regexp.MustCompile(`^#`)
+	sharp  = regexp.MustCompile(`^#`)
+	contig = regexp.MustCompile(`^##contig=<ID=(\S+)>$`)
 )
 
 var (
@@ -75,7 +76,17 @@ func main() {
 
 	for scanner.Scan() {
 		if line := scanner.Text(); sharp.MatchString(line) {
-			fmt.Println(line)
+			if contig.MatchString(line) {
+				var matchs = contig.FindStringSubmatch(line)
+				var chr, ok = acc2chr[matchs[1]]
+				if ok {
+					fmt.Printf("##contig=<ID=%s>\n", chr)
+				} else {
+					fmt.Println(line)
+				}
+			} else {
+				fmt.Println(line)
+			}
 		} else {
 			var array = strings.Split(line, "\t")
 			var chr, ok = acc2chr[array[0]]
