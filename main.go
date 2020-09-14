@@ -52,6 +52,11 @@ var (
 		"",
 		"input vcf",
 	)
+	skip = flag.Bool(
+		"skip",
+		false,
+		"if skip alt contig not in [1..22,X,Y,MT]",
+	)
 )
 
 func main() {
@@ -81,7 +86,7 @@ func main() {
 				var chr, ok = acc2chr[matchs[1]]
 				if ok {
 					fmt.Printf("##contig=<ID=%s>\n", chr)
-				} else {
+				} else if !*skip {
 					fmt.Println(line)
 				}
 			} else {
@@ -92,6 +97,8 @@ func main() {
 			var chr, ok = acc2chr[array[0]]
 			if ok {
 				array[0] = chr
+			} else if *skip {
+				continue
 			}
 			fmt.Println(strings.Join(array, "\t"))
 		}
